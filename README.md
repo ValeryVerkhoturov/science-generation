@@ -1,10 +1,4 @@
-# Chat for embedding in site
-
-## Example 
-
-```html
-<script async src="http://localhost:8080/v1/chat-widget?lang=en"></script>
-```
+# Science generation
 
 ## Develop
 
