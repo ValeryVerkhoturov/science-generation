@@ -1,0 +1,13 @@
+# Go
+app
+*.swp
+*.test
+*.out
+tmp
+.env
+
+# Node.js
+node_modules
+
+# IDE
+.idea/
