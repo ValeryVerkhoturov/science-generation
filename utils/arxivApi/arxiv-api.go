@@ -47,3 +47,25 @@ func Query(query string, page int) (arxivModels.Feed, error) {
 
 	return feed, nil
 }
+
+func DownloadPdf(href string) ([]byte, error) {
+	resp, err := http.Get(href)
+	if err != nil {
+		log.Error("Error downloading:", href, err)
+		return nil, err
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Println("Error closing response body:", err)
+		}
+	}(resp.Body)
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Error("Error reading response body:", err)
+		return nil, err
+	}
+
+	return data, nil
+}

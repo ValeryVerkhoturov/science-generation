@@ -6,13 +6,14 @@ import (
 )
 
 const (
-	SessionName    = "chat-widget"
-	SessionUserKey = "userId"
+	TextRecognitionAsyncUrl = "https://ocr.api.cloud.yandex.net/ocr/v1/recognizeTextAsync"
+	GetRecognitionUrl       = "https://ocr.api.cloud.yandex.net/ocr/v1/getRecognition?operationId="
 )
 
 var (
-	Port string
-	Host string
+	Port                 string
+	Host                 string
+	YandexCloudOcrApiKey string
 )
 
 func init() {
@@ -26,8 +27,9 @@ func init() {
 
 	Port = os.Getenv("PORT")
 	Host = os.Getenv("HOST")
+	YandexCloudOcrApiKey = os.Getenv("YANDEX_CLOUD_OCR_API_KEY")
 
-	if len(Port) == 0 || len(Host) == 0 {
+	if len(Port) == 0 || len(Host) == 0 || len(YandexCloudOcrApiKey) == 0 {
 		panic("Invalid env variables")
 	}
 }
