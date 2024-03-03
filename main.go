@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ValeryVerkhoturov/chat/config"
 	"github.com/ValeryVerkhoturov/chat/handlers"
+	"github.com/ValeryVerkhoturov/chat/utils/formatting"
 	"github.com/gin-contrib/graceful"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,7 @@ func port() string {
 	return ":" + port
 }
 
-func createGzipMiddleware() gin.HandlerFunc {
+func newGzipMiddleware() gin.HandlerFunc {
 	return gzip.Gzip(gzip.DefaultCompression)
 }
 
@@ -32,18 +33,21 @@ func newRouter() *graceful.Graceful {
 	}
 
 	router.Use(gin.Recovery())
-	router.Use(createGzipMiddleware())
+	router.Use(newGzipMiddleware())
 
 	router.Static("/images/", "./public/images")
 	router.StaticFile("/css/output.css", "./public/css/output.css")
 	router.StaticFile("/robots.txt", "./public/robots.txt")
 	router.LoadHTMLGlob("templates/templates/**/*")
 
-	//router.NoRoute(handlers.NotFound)
+	router.NoRoute(handlers.NotFound)
 
-	router.GET("/", handlers.Index)
-	router.GET("/index.html", handlers.Index)
+	router.GET(string(formatting.Index), handlers.Index)
+	router.GET(string(formatting.Generate), handlers.Generate)
+	router.GET(string(formatting.ResetIndex), handlers.ResetIndex)
+	router.GET(string(formatting.Help), handlers.Help)
 	router.POST("/process-query", handlers.ProcessQuery)
+	router.POST("/append-to-index", handlers.AppendToIndex)
 
 	v1Router := router.Group("/v1")
 

@@ -1,0 +1,65 @@
+<div id="file-search-form" class="container mx-auto p-8">
+    <div class="max-w-sm mx-auto">
+        <form hx-vals='{"page": "1"}'
+              hx-indicator="#spinner"
+              autocomplete="off"
+              hx-post="/process-query"
+              hx-target="#file-search-form"
+              hx-swap="outerHTML"
+              class="flex items-center mb-4">
+            <label class="w-full">
+                <input value="{{ .Query }}"
+                       autocomplete="off"
+                       type="search"
+                       name="query"
+                       placeholder="Enter your query..."
+                       class="w-full rounded-l border-0 p-2" />
+            </label>
+            <button type="submit" class="bg-blue-500 text-white rounded-r px-4 py-2">Submit</button>
+        </form>
+        <div  id="spinner" class="htmx-indicator">{{template "loader.html" .}}</div>
+    </div>
+    <div class="mx-auto max-w-sm md:max-w-md">
+        {{ if .Error }}
+            <div class="container mx-auto p-8 text-center text-red-500">{{ .Error }}</div>
+        {{ else if .Data }}
+            {{ if .Data.Entries }}
+                <ul class="divide-y divide-gray-300">
+                    {{ range $i, $a := .Data.Entries }}
+                        <li class="pt-6 pb-2">
+                            <div class="flex justify-between items-center">
+                                <div class="flex-1">
+                                    <a href="{{ $a.Link.Href }}" target="_blank" class="text-md font-semibold hover:text-blue-600">{{ $a.Title }}</a>
+                                    <p class="text-xs text-gray-600">Published: {{ $a.Published }}</p>
+                                </div>
+                                <button id="append-to-index-{{ $i }}" hx-post="/append-to-index"
+                                        hx-vals='{"href": "{{ $a.Link.Href }}"}'
+                                        hx-target="#append-to-index-{{ $i }}"
+                                        hx-indicator="#append-to-index-spinner-{{ $i }}"
+                                        hx-swap="innerHTML"
+                                        class="w-16 flex-none">
+                                    <span class="text-blue-500 hover:text-blue-600">Append to index</span>
+                                </button>
+                            </div>
+                            <span  id="append-to-index-spinner-{{ $i }}" class="htmx-indicator">{{template "loader.html" .}}</span>
+                        </li>
+                    {{ end }}
+                </ul>
+                <div class="mx-auto max-w-sm md:max-w-md mt-8">
+                    <div class="flex justify-between">
+                        <button hx-post="/process-query" hx-vals='{"page": "{{ .Pagination.PreviousPage }}", "query": "{{ .Query }}"}' hx-indicator="#page-spinner" hx-target="#file-search-form" hx-swap="outerHTML" class="bg-blue-500 text-white rounded px-4 py-2 {{ if eq .Pagination.Page 1 }}opacity-50 cursor-not-allowed{{ else }}hover:bg-blue-600{{ end }}" {{ if eq .Pagination.Page 1 }}disabled{{ end }}>
+                            Previous
+                        </button>
+                        <span>Page {{ .Pagination.Page }}</span>
+                        <button hx-post="/process-query" hx-vals='{"page": "{{ .Pagination.NextPage }}", "query": "{{ .Query }}"}' hx-indicator="#page-spinner" hx-target="#file-search-form" hx-swap="outerHTML" class="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600">
+                            Next
+                        </button>
+                    </div>
+                    <div  id="page-spinner" class="htmx-indicator flex justify-center">{{template "loader.html" .}}</div>
+                </div>
+            {{ end }}
+        {{ else }}
+            <div class="container mx-auto p-8 text-center">No results</div>
+        {{ end }}
+    </div>
+</div>
